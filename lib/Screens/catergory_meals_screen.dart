@@ -1,38 +1,64 @@
 import 'package:flutter/material.dart';
-import '../dummy_data.dart';
-import '../Widgets/wigets.dart';
+import 'package:meals_app/models/meal.dart';
 
-class CatergoryMealsScreen extends StatelessWidget {
+import '../Widgets/wigets.dart';
+import '../models/models.dart';
+
+class CatergoryMealsScreen extends StatefulWidget {
   static const routeName = '/category-meals';
+  final List<Meal> availableMeals;
+  const CatergoryMealsScreen({Key? key, required this.availableMeals})
+      : super(key: key);
+
+  @override
+  State<CatergoryMealsScreen> createState() => _CatergoryMealsScreenState();
+}
+
+class _CatergoryMealsScreenState extends State<CatergoryMealsScreen> {
   // final String categoryId;
-  // final String categoryTitle;
-  // const CatergoryMealsScreen(
-  //     {Key? key, required this.categoryId, required this.categoryTitle})
-  //     : super(key: key);
+  var init = false;
+  List<Meal>? _displayedMeals;
+  String? _categoryTitle;
+
+  @override
+  void didChangeDependencies() {
+    if (!init) {
+      final routeArgs =
+          ModalRoute.of(context)!.settings.arguments as Map<String, String>;
+
+      _categoryTitle = routeArgs['title'];
+      final categoryId = routeArgs['id'];
+      _displayedMeals = widget.availableMeals.where((meal) {
+        return meal.categories.contains(categoryId);
+      }).toList();
+      init = true;
+    }
+
+    super.didChangeDependencies();
+  }
+
+  void removeItem(String mealID) {
+    setState(() {
+      _displayedMeals!.removeWhere((meal) => meal.id == mealID);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final routeArgs =
-        ModalRoute.of(context)!.settings.arguments as Map<String, String>;
-    final categoryTitle = routeArgs['title'];
-    final categoryId = routeArgs['id'];
-    final categoryMeals = DUMMY_MEALS.where((meal) {
-      return meal.categories.contains(categoryId);
-    }).toList();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Category meals screen'),
       ),
       body: ListView.builder(
-          itemCount: categoryMeals.length,
+          itemCount: _displayedMeals!.length,
           itemBuilder: (ctx, idx) {
             return MealItem(
-              title: categoryMeals[idx].title,
-              imageUrl: categoryMeals[idx].imageUrl,
-              duration: categoryMeals[idx].duration,
-              complexity: categoryMeals[idx].complexity,
-              affordability: categoryMeals[idx].affordability,
-              id: categoryMeals[idx].id,
+              title: _displayedMeals![idx].title,
+              imageUrl: _displayedMeals![idx].imageUrl,
+              duration: _displayedMeals![idx].duration,
+              complexity: _displayedMeals![idx].complexity,
+              affordability: _displayedMeals![idx].affordability,
+              id: _displayedMeals![idx].id,
             );
           }),
     );
