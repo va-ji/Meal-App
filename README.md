@@ -2,7 +2,7 @@
 
 A new Flutter project.
 
-## Getting Started
+Getting started on flutter, learning about navigator and different widgets you can use demostrated in a Meals app
 
 This project is a starting point for a Flutter application.
 
